@@ -4,10 +4,16 @@ ARG GCC_ARM_NAME=gcc-arm-none-eabi-10-2020-q4-major
 ARG CMAKE_VERSION=3.22.2
 ARG WGET_ARGS="-q --show-progress --progress=bar:force:noscroll --no-check-certificate"
 
-ARG UID=1000
-ARG GID=1000
+ARG user=developer
+
+
+
+# Switch back to root user for installation
+USER root
 
 ENV DEBIAN_FRONTEND noninteractive
+
+RUN useradd -ms /bin/bash ${user}
 
 RUN dpkg --add-architecture i386 && \
 	apt-get -y update && \
@@ -23,22 +29,23 @@ RUN dpkg --add-architecture i386 && \
 	automake \
 	bison \
 	build-essential \
+	byacc \
 	dos2unix \
 	doxygen \
 	file \
 	flex \
-	g++ \
-	gawk \
-	gcc \
-	gcc-multilib \
-	g++-multilib \
-	gcovr \
+	#g++ \
+	#gawk \
+	#gcc \
+	#gcc-multilib \
+	#g++-multilib \
+	#gcovr \
 	git \
-	git-core \
-	gperf \
+#	git-core \
+#	gperf \
     graphviz \
-	gtk-sharp2 \
-	libncurses5-dev \
+#	gtk-sharp2 \
+#	libncurses5-dev \
 	libopenal-dev \
 	libpcap-dev \
 	libsdl2-dev:i386 \
@@ -49,35 +56,32 @@ RUN dpkg --add-architecture i386 && \
 	libsdl2-mixer-dev \
 	libsdl2-net-dev \
 	libsdl2-ttf-dev \
-	libssl-dev \
+#	libssl-dev \
 	libwxgtk3.0-gtk3-dev \
 	locales \
 	make \
 	nano \
 	ninja-build \
 	openssh-client \
-	pkg-config \
+#	pkg-config \
+	p7zip-full \
 	protobuf-compiler \
 	python3-dev \
 	python3-pip \
 	python3-ply \
 	python3-setuptools \
 	python-is-python3 \
-	qemu \
-	rsync \
-	socat \
-	srecord \
+#	qemu \
+#	rsync \
+#	socat \
+#	srecord \
 	sudo \
 	texinfo \
-	unzip \
-	valgrind \
-	wget \
-	byacc \
-	flex \
-	xa65 \
-	dos2unix \
-	texinfo \
 	texlive-fonts-recommended \
+	unzip \
+#	valgrind \
+	wget \
+	xa65 \
 	cc65 \
 	64tass \
 	xz-utils && \
@@ -98,9 +102,9 @@ RUN pip3 install wheel pip -U &&\
 
 RUN mkdir -p /opt/toolchains
 
-RUN wget ${WGET_ARGS} https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/${GCC_ARM_NAME}-x86_64-linux.tar.bz2  && \
-	tar -xf ${GCC_ARM_NAME}-x86_64-linux.tar.bz2 -C /opt/toolchains/ && \
-	rm -f ${GCC_ARM_NAME}-x86_64-linux.tar.bz2
+#RUN wget ${WGET_ARGS} https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/${GCC_ARM_NAME}-x86_64-linux.tar.bz2  && \
+#	tar -xf ${GCC_ARM_NAME}-x86_64-linux.tar.bz2 -C /opt/toolchains/ && \
+#	rm -f ${GCC_ARM_NAME}-x86_64-linux.tar.bz2
 
 RUN wget ${WGET_ARGS} https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
 	chmod +x cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
@@ -110,22 +114,20 @@ RUN wget ${WGET_ARGS} https://github.com/Kitware/CMake/releases/download/v${CMAK
 RUN apt-get clean && \
 	sudo apt-get autoremove --purge
 
-RUN groupadd -g $GID -o user
+#RUN wget ${WGET_ARGS} https://static.rust-lang.org/rustup/rustup-init.sh && \
+#	chmod +x rustup-init.sh && \
+#	./rustup-init.sh -y && \
+#	. $HOME/.cargo/env && \
+#	cargo install uefi-run --root /usr && \
+#	rm -f ./rustup-init.sh
 
-RUN useradd -u $UID -m -g user -G plugdev user \
-	&& echo 'user ALL = NOPASSWD: ALL' > /etc/sudoers.d/user \
-	&& chmod 0440 /etc/sudoers.d/user
-
-RUN wget ${WGET_ARGS} https://static.rust-lang.org/rustup/rustup-init.sh && \
-	chmod +x rustup-init.sh && \
-	./rustup-init.sh -y && \
-	. $HOME/.cargo/env && \
-	cargo install uefi-run --root /usr && \
-	rm -f ./rustup-init.sh
-
-USER root
+#USER root
+# No need to be root anymore
+USER ${user}
+WORKDIR /home/${user}
 
 # Set the locale
-ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/toolchains/${GCC_ARM_NAME}
-ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
-ENV OVMF_FD_PATH=/usr/share/ovmf/OVMF.fd
+#ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/toolchains/${GCC_ARM_NAME}
+#ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
+
+CMD ["/bin/bash"]
