@@ -1,8 +1,7 @@
 FROM ubuntu:20.04
 
 ARG GCC_ARM_NAME=gcc-arm-none-eabi-10-2020-q4-major
-ARG CMAKE_VERSION=3.20.5
-ARG RENODE_VERSION=1.12.0
+ARG CMAKE_VERSION=3.22.2
 ARG WGET_ARGS="-q --show-progress --progress=bar:force:noscroll --no-check-certificate"
 
 ARG UID=1000
