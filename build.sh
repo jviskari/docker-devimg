@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build  . -t docker-devimg:v1.0
+docker build  . -t docker-devimg:v1.1

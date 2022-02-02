@@ -84,7 +84,9 @@ RUN dpkg --add-architecture i386 && \
 	xa65 \
 	cc65 \
 	64tass \
-	xz-utils && \
+	xz-utils \
+#COBOL
+        gnucobol &&\	
 	rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
